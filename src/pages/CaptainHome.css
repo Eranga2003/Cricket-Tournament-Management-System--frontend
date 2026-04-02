@@ -1,0 +1,148 @@
+.captain-dashboard {
+    min-height: 100vh;
+    background-color: #05050a;
+    background-image:
+        radial-gradient(circle at top center, rgba(112, 0, 255, 0.15), transparent 60%),
+        radial-gradient(circle at bottom, rgba(0, 225, 255, 0.1), transparent 50%);
+    color: white;
+}
+
+.squad-header {
+    margin: 2rem;
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(145deg, rgba(30, 20, 50, 0.8), rgba(15, 20, 40, 0.8));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+}
+
+.squad-main {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.tournaments-feed {
+    margin: 0 2rem 3rem 2rem;
+}
+
+.feed-title {
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+    text-shadow: 0 0 10px rgba(255, 46, 147, 0.5);
+    color: white;
+}
+
+.tournament-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.tournament-card {
+    background: rgba(20, 25, 45, 0.8);
+    padding: 2rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tournament-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(0, 225, 255, 0.3);
+    box-shadow: 0 15px 40px rgba(0, 225, 255, 0.15);
+}
+
+.card-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-fee {
+    font-weight: 800;
+    color: #ffb5d4;
+    background: rgba(255, 46, 147, 0.15);
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+}
+
+.tournament-card h3 {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0;
+}
+
+.card-location {
+    color: #a0a0b0;
+    font-size: 0.95rem;
+}
+
+.card-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat-pill {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #d0d0e0;
+}
+
+.prize-pool {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.prize-pool p {
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-date {
+    color: #00E1FF;
+    font-weight: 600;
+}
+
+.apply-btn {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+    color: white;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.apply-btn:hover {
+    box-shadow: 0 0 20px rgba(0, 225, 255, 0.6);
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    .squad-main {
+        flex-direction: column;
+        text-align: center;
+    }
+}

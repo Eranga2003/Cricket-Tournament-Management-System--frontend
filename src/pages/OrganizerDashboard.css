@@ -1,0 +1,221 @@
+.dashboard-container {
+    min-height: 100vh;
+    background-color: #05050A;
+    background-image:
+        radial-gradient(circle at top left, rgba(255, 46, 147, 0.15), transparent 40%),
+        radial-gradient(circle at bottom right, rgba(0, 225, 255, 0.15), transparent 40%);
+    color: white;
+}
+
+.dashboard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.logout-btn {
+    background: rgba(255, 46, 147, 0.1);
+    color: #ffb5d4;
+    border: 1px solid rgba(255, 46, 147, 0.3);
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 46, 147, 0.2);
+    color: white;
+    border-color: rgba(255, 46, 147, 0.6);
+}
+
+.dashboard-content {
+    padding: 2rem;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.5rem !important;
+    max-width: none !important;
+    background: linear-gradient(145deg, rgba(30, 20, 50, 0.6), rgba(15, 20, 40, 0.6));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.profile-main {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex: 1;
+    min-width: 300px;
+}
+
+.profile-logo,
+.profile-logo-placeholder {
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 225, 255, 0.3);
+}
+
+.profile-logo-placeholder {
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.profile-info h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.profile-info p {
+    color: #a0a0b0;
+    font-size: 0.95rem;
+}
+
+.highlight-text {
+    color: var(--primary-blue);
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px rgba(0, 225, 255, 0.5);
+}
+
+.new-tournament-btn {
+    background: linear-gradient(90deg, #FF2E93, #7000FF);
+    border: none;
+    padding: 1rem 1.8rem;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(112, 0, 255, 0.4);
+    white-space: nowrap;
+}
+
+.new-tournament-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 46, 147, 0.5);
+}
+
+.tournaments-section {
+    padding: 2.5rem !important;
+    max-width: none !important;
+    background: linear-gradient(145deg, rgba(20, 25, 45, 0.6), rgba(30, 20, 40, 0.6));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tournaments-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: var(--primary-blue);
+    border-bottom: 1px solid rgba(0, 225, 255, 0.2);
+    padding-bottom: 0.8rem;
+}
+
+.empty-state {
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.tournaments-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tournaments-table th,
+.tournaments-table td {
+    padding: 1.2rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tournaments-table th {
+    color: #8fa0c0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.tournaments-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.status-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.upcoming {
+    background: rgba(0, 225, 255, 0.1);
+    color: #00E1FF;
+    border: 1px solid rgba(0, 225, 255, 0.3);
+}
+
+.status-badge.live {
+    background: rgba(255, 46, 147, 0.1);
+    color: #FF2E93;
+    border: 1px solid rgba(255, 46, 147, 0.3);
+}
+
+.status-badge.completed {
+    background: rgba(255, 255, 255, 0.05);
+    color: #909090;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 900px) {
+    .dashboard-content {
+        padding: 1.5rem;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-main {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,58 @@
+.login-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.login-hero {
+    flex: 1.2;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: radial-gradient(circle at top right, rgba(0, 225, 255, 0.1), transparent 50%),
+        radial-gradient(circle at bottom left, rgba(112, 0, 255, 0.1), transparent 50%);
+}
+
+.login-card {
+    max-width: 400px !important;
+}
+
+.redirect-text {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    color: #a0a0a0;
+}
+
+.redirect-text a {
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+@media (max-width: 900px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-hero {
+        min-height: 300px;
+        flex: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .login-form-section {
+        padding: 1.5rem 1rem;
+    }
+}

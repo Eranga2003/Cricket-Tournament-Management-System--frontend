@@ -1,0 +1,110 @@
+/* Weather Animations.css */
+/* Premium CSS-only weather animations for the tournament cards */
+
+.weather-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 5;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Icon Containers */
+.weather-icon-container {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Sunny Animation */
+.sunny-icon {
+    font-size: 1.2rem;
+    color: #FFD700;
+    animation: rotate-sun 10s linear infinite;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes rotate-sun {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Rainy Animation */
+.rainy-icon {
+    font-size: 1.2rem;
+    color: #4FB3FF;
+    position: relative;
+}
+
+.rain-drops {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.drop {
+    width: 2px;
+    height: 6px;
+    background: #4FB3FF;
+    border-radius: 50%;
+    animation: fall 1s linear infinite;
+    opacity: 0;
+}
+
+.drop:nth-child(2) { animation-delay: 0.3s; }
+.drop:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes fall {
+    0% { transform: translateY(-5px); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(10px); opacity: 0; }
+}
+
+/* Cloudy Animation */
+.cloudy-icon {
+    font-size: 1.2rem;
+    color: #dfdfdf;
+    animation: drift 3s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+    from { transform: translateX(-2px); }
+    to { transform: translateX(2px); }
+}
+
+/* Stormy Animation */
+.stormy-icon {
+    font-size: 1.2rem;
+    color: #888;
+    animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-1px, 1px); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(-1px, -1px); }
+}
+
+/* Extra premium glow for weather stats */
+.temp-value {
+    background: linear-gradient(90deg, #fff, #00E1FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}

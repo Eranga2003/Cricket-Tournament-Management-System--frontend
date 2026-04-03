@@ -13,15 +13,28 @@ const CreateTeam = () => {
         team_name: '',
         team_email: '',
         password: '',
-        location: '',
-        logo_url: ''
+        location: ''
     });
 
+    const [logo, setLogo] = useState(null);
+    const [logoPreview, setLogoPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleLogoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setLogo(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setLogoPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -30,11 +43,22 @@ const CreateTeam = () => {
         setError(null);
 
         try {
-            await axios.post('http://localhost:5000/api/teams/register', {
-                ...formData,
-                captain_id: user.id // Inject authentic captain ID automatically
+            const data = new FormData();
+            data.append('team_name', formData.team_name);
+            data.append('team_email', formData.team_email);
+            data.append('password', formData.password);
+            data.append('location', formData.location);
+            data.append('captain_id', user.id);
+            if (logo) {
+                data.append('logo', logo);
+            }
+
+            await axios.post('http://localhost:5000/api/teams/register', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-            // Automatically push them to the Captain Home now that their team exists
+            
             navigate('/captain-home');
         } catch (err) {
             setError(err.response?.data?.msg || err.response?.data?.error || err.message);
@@ -43,7 +67,6 @@ const CreateTeam = () => {
         }
     };
 
-    // Failsafe in case a non-captain navigates here directly
     if (role !== 'captain') {
         return <div style={{ padding: '5rem', color: 'white', textAlign: 'center' }}>Only an authenticated Captain can create a squad.</div>;
     }
@@ -65,6 +88,32 @@ const CreateTeam = () => {
                     <form onSubmit={handleSubmit} className="form-layout">
                         {error && <div className="error-message">{error}</div>}
 
+                        {/* Premium Logo Upload UI */}
+                        <div className="image-upload-container">
+                            <label style={{ marginBottom: '0.5rem', display: 'block', textAlign: 'center' }}>Official Team Logo</label>
+                            <label className="image-upload-wrapper">
+                                <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={handleLogoChange} 
+                                    style={{ display: 'none' }}
+                                />
+                                <div className="image-view-placeholder">
+                                    {logoPreview ? (
+                                        <img src={logoPreview} alt="Logo Preview" className="image-preview" />
+                                    ) : (
+                                        <div className="upload-icon-box">
+                                            <span className="upload-icon">🛡️</span>
+                                            <span className="upload-text">Upload Logo</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="upload-overlay">
+                                    <span>📸</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div className="input-group">
                             <label>Official Team Name *</label>
                             <input type="text" name="team_name" value={formData.team_name} onChange={handleChange} required placeholder="Gladiators BC" />
@@ -83,11 +132,6 @@ const CreateTeam = () => {
                         <div className="input-group">
                             <label>Base Location</label>
                             <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="City, Region" />
-                        </div>
-
-                        <div className="input-group">
-                            <label>Team Logo URL</label>
-                            <input type="text" name="logo_url" value={formData.logo_url} onChange={handleChange} placeholder="https://..." />
                         </div>
 
                         <button type="submit" className="submit-btn" disabled={loading}>

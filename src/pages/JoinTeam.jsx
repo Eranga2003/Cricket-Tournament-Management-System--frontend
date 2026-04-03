@@ -1,34 +1,59 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './OrganizerRegistration.css'; // Inheriting baseline auth aesthetic
 import bgImage from '../assets/bg.png';
 
 const JoinTeam = () => {
     const { teamId } = useParams();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         name: '',
         mobile_number: '',
         role: 'Batsman',
-        image_url: '',
         birthday: ''
     });
 
+    const [image, setImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
         try {
-            await axios.post('http://localhost:5000/api/players/register', {
-                ...formData,
-                team_id: teamId
+            const data = new FormData();
+            data.append('name', formData.name);
+            data.append('mobile_number', formData.mobile_number);
+            data.append('role', formData.role);
+            data.append('birthday', formData.birthday);
+            data.append('team_id', teamId);
+            if (image) {
+                data.append('image', image);
+            }
+
+            await axios.post('http://localhost:5000/api/players/register', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
             setSuccess(true);
         } catch (err) {
@@ -64,6 +89,32 @@ const JoinTeam = () => {
                         <form onSubmit={handleSubmit} className="form-layout">
                             {error && <div className="error-message">{error}</div>}
 
+                            {/* Premium Photo Upload UI */}
+                            <div className="image-upload-container">
+                                <label style={{ marginBottom: '0.5rem', display: 'block', textAlign: 'center' }}>Athlete Profile Photo</label>
+                                <label className="image-upload-wrapper">
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={handleImageChange} 
+                                        style={{ display: 'none' }}
+                                    />
+                                    <div className="image-view-placeholder" style={{ borderRadius: '24px' }}>
+                                        {imagePreview ? (
+                                            <img src={imagePreview} alt="Player Preview" className="image-preview" />
+                                        ) : (
+                                            <div className="upload-icon-box">
+                                                <span className="upload-icon" style={{ fontSize: '2.5rem' }}>🏏</span>
+                                                <span className="upload-text">Upload Photo</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="upload-overlay" style={{ borderRadius: '24px' }}>
+                                        <span>📸</span>
+                                    </div>
+                                </label>
+                            </div>
+
                             <div className="input-group">
                                 <label>Full Name *</label>
                                 <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="M. Perera" />
@@ -97,11 +148,6 @@ const JoinTeam = () => {
                                     <option value="All-Rounder">All-Rounder</option>
                                     <option value="Wicket-Keeper">Wicket-Keeper</option>
                                 </select>
-                            </div>
-
-                            <div className="input-group">
-                                <label>Profile Image URL (Optional)</label>
-                                <input type="text" name="image_url" value={formData.image_url} onChange={handleChange} placeholder="https://..." />
                             </div>
 
                             <div className="input-group">

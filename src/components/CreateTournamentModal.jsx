@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './CreateTournamentModal.css';
+import '../pages/OrganizerRegistration.css'; // Importing shared premium styles
 
 const CreateTournamentModal = ({ onClose, onCreated }) => {
     const { token } = useContext(AuthContext);
@@ -16,13 +17,15 @@ const CreateTournamentModal = ({ onClose, onCreated }) => {
         prize_2nd: 0,
         prize_3rd: 0,
         contact_numbers: [],
-        ground_images: []
+        near_city: ''
     });
+
+    const [imageFiles, setImageFiles] = useState([]);
+    const [previews, setPreviews] = useState([]);
 
     // For array inputs to keep them as strings while typing
     const [arrayInputs, setArrayInputs] = useState({
-        contact_numbers: '',
-        ground_images: ''
+        contact_numbers: ''
     });
 
     const [loading, setLoading] = useState(false);
@@ -39,14 +42,57 @@ const CreateTournamentModal = ({ onClose, onCreated }) => {
         setFormData({ ...formData, [name]: array });
     };
 
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length + imageFiles.length > 5) {
+            alert("Maximum 5 ground images allowed.");
+            return;
+        }
+
+        const newFiles = [...imageFiles, ...files];
+        setImageFiles(newFiles);
+
+        // Generate previews
+        const newPreviews = files.map(file => URL.createObjectURL(file));
+        setPreviews([...previews, ...newPreviews]);
+    };
+
+    const removeImage = (index) => {
+        const updatedFiles = [...imageFiles];
+        updatedFiles.splice(index, 1);
+        setImageFiles(updatedFiles);
+
+        const updatedPreviews = [...previews];
+        updatedPreviews.splice(index, 1);
+        setPreviews(updatedPreviews);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            await axios.post('http://localhost:5000/api/tournaments/create', formData, {
-                headers: { Authorization: `Bearer ${token}` }
+            const data = new FormData();
+            // Append standard fields
+            Object.keys(formData).forEach(key => {
+                if (Array.isArray(formData[key])) {
+                    formData[key].forEach(val => data.append(`${key}[]`, val));
+                } else {
+                    data.append(key, formData[key]);
+                }
+            });
+
+            // Append images
+            imageFiles.forEach(file => {
+                data.append('ground_images', file);
+            });
+
+            await axios.post('http://localhost:5000/api/tournaments/create', data, {
+                headers: { 
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
             });
             onCreated();
             onClose();
@@ -59,9 +105,9 @@ const CreateTournamentModal = ({ onClose, onCreated }) => {
 
     return (
         <div className="modal-backdrop">
-            <div className="modal-content glass-card">
+            <div className="modal-content glass-card tournament-modal">
                 <h2>Organize New Tournament</h2>
-                <p className="subtitle">Fill in all details matching the backend tournament model.</p>
+                <p className="subtitle">Launch your event to the global community.</p>
 
                 <form onSubmit={handleSubmit} className="form-layout modal-form">
                     {error && <div className="error-message">{error}</div>}
@@ -69,7 +115,7 @@ const CreateTournamentModal = ({ onClose, onCreated }) => {
                     <div className="form-row">
                         <div className="input-group">
                             <label>Tournament Name *</label>
-                            <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+                            <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Summer Cup 2026" />
                         </div>
                         <div className="input-group">
                             <label>Date & Time *</label>
@@ -77,27 +123,33 @@ const CreateTournamentModal = ({ onClose, onCreated }) => {
                         </div>
                     </div>
 
-                    <div className="input-group">
-                        <label>Location</label>
-                        <input type="text" name="location" value={formData.location} onChange={handleChange} />
-                    </div>
-
                     <div className="form-row">
                         <div className="input-group">
-                            <label>Registration Fee</label>
+                            <label>Venue Location *</label>
+                            <input type="text" name="location" value={formData.location} onChange={handleChange} required placeholder="Stadium Name, Address" />
+                        </div>
+                        <div className="input-group">
+                            <label>Nearest City (for Weather) *</label>
+                            <input type="text" name="near_city" value={formData.near_city} onChange={handleChange} required placeholder="e.g. Colombo, Galle" />
+                        </div>
+                    </div>
+
+                    <div className="form-row secondary-stats">
+                        <div className="input-group">
+                            <label>Fee</label>
                             <input type="number" name="registration_fee" value={formData.registration_fee} onChange={handleChange} />
                         </div>
                         <div className="input-group">
-                            <label>Overs / Match</label>
+                            <label>Overs/Match</label>
                             <input type="number" name="overs" value={formData.overs} onChange={handleChange} />
                         </div>
                         <div className="input-group">
-                            <label>Balls Per Over</label>
+                            <label>Balls/Over</label>
                             <input type="number" name="balls_per_over" value={formData.balls_per_over} onChange={handleChange} />
                         </div>
                     </div>
 
-                    <div className="form-row">
+                    <div className="form-row prize-row">
                         <div className="input-group">
                             <label>1st Prize</label>
                             <input type="number" name="prize_1st" value={formData.prize_1st} onChange={handleChange} />
@@ -112,24 +164,34 @@ const CreateTournamentModal = ({ onClose, onCreated }) => {
                         </div>
                     </div>
 
-                    <div className="form-row">
-                        <div className="input-group">
-                            <label>Contact Numbers (comma separated)</label>
-                            <input type="text" name="contact_numbers" value={arrayInputs.contact_numbers} onChange={handleArrayInputChange} placeholder="077xxxxxxx, 071xxxxxxx" />
-                        </div>
+                    <div className="input-group">
+                        <label>Contact Numbers (comma separated)</label>
+                        <input type="text" name="contact_numbers" value={arrayInputs.contact_numbers} onChange={handleArrayInputChange} placeholder="077xxxxxxx, 071xxxxxxx" />
                     </div>
 
-                    <div className="form-row">
-                        <div className="input-group">
-                            <label>Ground Images (comma separated URLs)</label>
-                            <input type="text" name="ground_images" value={arrayInputs.ground_images} onChange={handleArrayInputChange} placeholder="https://..." />
+                    {/* Premium Multi-Image Gallery Upload */}
+                    <div className="input-group tournament-gallery-upload">
+                        <label>Ground Images / Posters (Max 5)</label>
+                        <div className="gallery-upload-grid">
+                            {previews.map((preview, index) => (
+                                <div key={index} className="gallery-item">
+                                    <img src={preview} alt={`preview-${index}`} className="gallery-preview" />
+                                    <button type="button" className="remove-img-btn" onClick={() => removeImage(index)}>×</button>
+                                </div>
+                            ))}
+                            {previews.length < 5 && (
+                                <label className="add-img-card">
+                                    <input type="file" multiple accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                                    <span style={{ fontSize: '1.5rem' }}>+</span>
+                                </label>
+                            )}
                         </div>
                     </div>
 
                     <div className="modal-actions">
                         <button type="button" className="cancel-btn" onClick={onClose} disabled={loading}>Cancel</button>
                         <button type="submit" className="submit-btn" disabled={loading}>
-                            {loading ? 'Creating...' : 'Create Tournament'}
+                            {loading ? <span className="spinner"></span> : 'Create Tournament'}
                         </button>
                     </div>
                 </form>

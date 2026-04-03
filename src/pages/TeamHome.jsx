@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './CaptainHome.css'; // Perfectly reuse the dark aesthetic grid
+import TournamentWeather from '../components/TournamentWeather';
 
 const TeamHome = () => {
     const { user, token, logout } = useContext(AuthContext);
@@ -67,34 +68,50 @@ const TeamHome = () => {
                     <div className="tournament-grid">
                         {tournaments.map(t => (
                             <div key={t.id} className="tournament-card glass-card">
-                                <div className="card-status-bar">
-                                    <span className={`status-badge ${t.status}`}>{t.status}</span>
-                                    <span className="card-fee">${t.registration_fee} Entry</span>
+                                
+                                {/* 1. Image Header Section */}
+                                <div className="card-image-header">
+                                    {t.ground_images && t.ground_images.length > 0 ? (
+                                        <img src={t.ground_images[0]} alt={t.name} />
+                                    ) : (
+                                        <div className="image-placeholder-gradient" style={{ height: '100%', background: 'linear-gradient(45deg, #182040, #25305a)' }}></div>
+                                    )}
+                                    <div className="image-overlay"></div>
+                                    
+                                    {/* 2. Weather Integration in Corner */}
+                                    <TournamentWeather location={t.location} nearCity={t.near_city} date={t.date_time} />
                                 </div>
 
-                                <h3>{t.name}</h3>
-                                <p className="card-location">📍 {t.location}</p>
+                                <div className="card-content">
+                                    <div className="card-status-bar">
+                                        <span className={`status-badge ${t.status}`}>{t.status}</span>
+                                        <span className="card-fee">${t.registration_fee} Entry</span>
+                                    </div>
 
-                                <div className="card-stats">
-                                    <div className="stat-pill"><strong>{t.overs}</strong> Overs</div>
-                                    <div className="stat-pill"><strong>{t.balls_per_over}</strong> Balls/Over</div>
-                                </div>
+                                    <h3>{t.name}</h3>
+                                    <p className="card-location">📍 {t.location}</p>
 
-                                <div className="prize-pool">
-                                    <p>🏆 1st Prize: <span className="highlight-text">${t.prize_1st}</span></p>
-                                    <p>🥈 2nd Prize: <span className="highlight-text">${t.prize_2nd}</span></p>
-                                    {t.prize_3rd > 0 && <p>🥉 3rd Prize: <span className="highlight-text">${t.prize_3rd}</span></p>}
-                                </div>
+                                    <div className="card-stats">
+                                        <div className="stat-pill"><strong>{t.overs}</strong> Overs</div>
+                                        <div className="stat-pill"><strong>{t.balls_per_over}</strong> Balls/Over</div>
+                                    </div>
 
-                                <div className="card-actions">
-                                    <p className="card-date">{new Date(t.date_time).toLocaleDateString()}</p>
-                                    <button
-                                        className="apply-btn"
-                                        style={{ background: 'linear-gradient(90deg, #182040, #25305a)' }}
-                                        onClick={() => handleShareLink(t.id)}
-                                    >
-                                        {copiedId === t.id ? 'Copied Link!' : 'Share Tourney'}
-                                    </button>
+                                    <div className="prize-pool">
+                                        <p>🏆 1st Prize: <span className="highlight-text">${t.prize_1st}</span></p>
+                                        <p>🥈 2nd Prize: <span className="highlight-text">${t.prize_2nd}</span></p>
+                                        {t.prize_3rd > 0 && <p>🥉 3rd Prize: <span className="highlight-text">${t.prize_3rd}</span></p>}
+                                    </div>
+
+                                    <div className="card-actions">
+                                        <p className="card-date">{new Date(t.date_time).toLocaleDateString()}</p>
+                                        <button
+                                            className="apply-btn"
+                                            style={{ background: 'linear-gradient(90deg, #182040, #25305a)' }}
+                                            onClick={() => handleShareLink(t.id)}
+                                        >
+                                            {copiedId === t.id ? 'Copied Link!' : 'Share Tourney'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))}

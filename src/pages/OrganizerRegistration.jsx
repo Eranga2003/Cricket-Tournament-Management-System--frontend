@@ -10,9 +10,11 @@ const OrganizerRegistration = () => {
         email: '',
         phone: '',
         password: '',
-        logo: '',
-        sponsors: ''
+        sponsors: []
     });
+
+    const [logoFile, setLogoFile] = useState(null);
+    const [logoPreview, setLogoPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
@@ -21,8 +23,19 @@ const OrganizerRegistration = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleLogoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setLogoFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setLogoPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSponsorsChange = (e) => {
-        // split comma separated values into an array
         const val = e.target.value;
         const array = val.split(',').map(s => s.trim()).filter(s => s);
         setFormData({ ...formData, sponsors: array });
@@ -33,7 +46,26 @@ const OrganizerRegistration = () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await axios.post('http://localhost:5000/api/organizers/register', formData);
+            const data = new FormData();
+            data.append('org_name', formData.org_name);
+            data.append('email', formData.email);
+            data.append('phone', formData.phone);
+            data.append('password', formData.password);
+            
+            // Append sponsors individually to the form data
+            formData.sponsors.forEach(sponsor => {
+                data.append('sponsors[]', sponsor);
+            });
+
+            if (logoFile) {
+                data.append('logo', logoFile);
+            }
+
+            const res = await axios.post('http://localhost:5000/api/organizers/register', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             if (res.data) setSuccess(true);
         } catch (err) {
             setError(err.response?.data?.msg || err.response?.data?.error || err.message);
@@ -65,6 +97,32 @@ const OrganizerRegistration = () => {
                     ) : (
                         <form onSubmit={handleSubmit} className="form-layout">
                             {error && <div className="error-message">{error}</div>}
+
+                            {/* Premium Logo Upload UI */}
+                            <div className="image-upload-container">
+                                <label style={{ marginBottom: '0.5rem', display: 'block', textAlign: 'center' }}>Official Organization Logo</label>
+                                <label className="image-upload-wrapper">
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={handleLogoChange} 
+                                        style={{ display: 'none' }}
+                                    />
+                                    <div className="image-view-placeholder">
+                                        {logoPreview ? (
+                                            <img src={logoPreview} alt="Logo Preview" className="image-preview" />
+                                        ) : (
+                                            <div className="upload-icon-box">
+                                                <span className="upload-icon" style={{ fontSize: '2.5rem' }}>🏢</span>
+                                                <span className="upload-text">Upload Logo</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="upload-overlay">
+                                        <span>📸</span>
+                                    </div>
+                                </label>
+                            </div>
 
                             <div className="input-group">
                                 <label>Organization Name *</label>
@@ -111,17 +169,6 @@ const OrganizerRegistration = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="Create a strong password"
-                                />
-                            </div>
-
-                            <div className="input-group">
-                                <label>Logo URL (Optional)</label>
-                                <input
-                                    type="text"
-                                    name="logo"
-                                    value={formData.logo}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
                                 />
                             </div>
 

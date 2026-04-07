@@ -9,6 +9,7 @@ import TeamHome from '../pages/TeamHome';
 import CreateTeam from '../pages/CreateTeam';
 import TeamProfile from '../pages/TeamProfile';
 import JoinTeam from '../pages/JoinTeam';
+import CaptainProfile from '../pages/CaptainProfile';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
@@ -40,6 +41,11 @@ const AppRoutes = () => {
             <Route path="/team-profile" element={
                 <ProtectedRoute>
                     <TeamProfile />
+                </ProtectedRoute>
+            } />
+            <Route path="/captain-profile" element={
+                <ProtectedRoute>
+                    <CaptainProfile />
                 </ProtectedRoute>
             } />
             <Route path="/join-team/:teamId" element={<JoinTeam />} />

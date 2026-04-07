@@ -10,6 +10,8 @@ const JoinTeam = () => {
 
     const [formData, setFormData] = useState({
         name: '',
+        username: '',
+        password: '',
         mobile_number: '',
         role: 'Batsman',
         birthday: ''
@@ -42,6 +44,8 @@ const JoinTeam = () => {
         try {
             const data = new FormData();
             data.append('name', formData.name);
+            data.append('username', formData.username);
+            data.append('password', formData.password);
             data.append('mobile_number', formData.mobile_number);
             data.append('role', formData.role);
             data.append('birthday', formData.birthday);
@@ -80,7 +84,7 @@ const JoinTeam = () => {
                     {success ? (
                         <div className="success-message">
                             <h3>✅ Successfully Drafted!</h3>
-                            <p>You have officially joined the team roster. Your captain can now view your competitive profile in the global Team Hub!</p>
+                            <p>You have officially joined the team roster. You can now login with your username and password to view the tournament feeds!</p>
                             <button onClick={() => navigate('/login')} className="submit-btn" style={{ marginTop: '2rem' }}>
                                 Go to Team Login
                             </button>
@@ -115,47 +119,62 @@ const JoinTeam = () => {
                                 </label>
                             </div>
 
-                            <div className="input-group">
-                                <label>Full Name *</label>
-                                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="M. Perera" />
+                            <div className="form-row">
+                                <div className="input-group">
+                                    <label>Full Name *</label>
+                                    <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="M. Perera" />
+                                </div>
+                                <div className="input-group">
+                                    <label>Mobile Number *</label>
+                                    <input type="text" name="mobile_number" value={formData.mobile_number} onChange={handleChange} required placeholder="07xxxxxxx" />
+                                </div>
                             </div>
 
-                            <div className="input-group">
-                                <label>Mobile Number *</label>
-                                <input type="text" name="mobile_number" value={formData.mobile_number} onChange={handleChange} required placeholder="07xxxxxxx" />
+                            <div className="auth-credentials-section glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem', background: 'rgba(255, 255, 255, 0.03)' }}>
+                                <div className="input-group">
+                                    <label>Login Username *</label>
+                                    <input type="text" name="username" value={formData.username} onChange={handleChange} required placeholder="cricketer_07" />
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Login Password *</label>
+                                    <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="••••••••" />
+                                </div>
                             </div>
 
-                            <div className="input-group" style={{ display: 'flex', flexDirection: 'column' }}>
-                                <label>Primary Role *</label>
-                                <select
-                                    name="role"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                    required
-                                    style={{
-                                        padding: '1rem 1.2rem',
-                                        borderRadius: '12px',
-                                        background: 'rgba(0, 0, 0, 0.4)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        color: 'white',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    <option value="Batsman">Batsman</option>
-                                    <option value="Bowler">Bowler</option>
-                                    <option value="All-Rounder">All-Rounder</option>
-                                    <option value="Wicket-Keeper">Wicket-Keeper</option>
-                                </select>
+                            <div className="form-row">
+                                <div className="input-group" style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <label>Primary Role *</label>
+                                    <select
+                                        name="role"
+                                        value={formData.role}
+                                        onChange={handleChange}
+                                        required
+                                        style={{
+                                            padding: '1rem 1.2rem',
+                                            borderRadius: '12px',
+                                            background: 'rgba(0, 0, 0, 0.4)',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            color: 'white',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        <option value="Batsman">Batsman</option>
+                                        <option value="Bowler">Bowler</option>
+                                        <option value="All-Rounder">All-Rounder</option>
+                                        <option value="Wicket-Keeper">Wicket-Keeper</option>
+                                    </select>
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Birthday (Optional)</label>
+                                    <input type="date" name="birthday" value={formData.birthday} onChange={handleChange} style={{ colorScheme: 'dark' }} />
+                                </div>
                             </div>
 
-                            <div className="input-group">
-                                <label>Birthday (Optional)</label>
-                                <input type="date" name="birthday" value={formData.birthday} onChange={handleChange} style={{ colorScheme: 'dark' }} />
-                            </div>
-
-                            <button type="submit" className="submit-btn" disabled={loading}>
+                            <button type="submit" className="submit-btn" style={{ marginTop: '1rem' }} disabled={loading}>
                                 {loading ? <span className="spinner"></span> : 'Join Official Roster'}
                             </button>
                         </form>

@@ -35,10 +35,10 @@ const Login = () => {
                 payload.email = formData.email;
             } else if (role === 'team') {
                 url = 'http://localhost:5000/api/teams/login';
-                payload.team_email = formData.email; // Teams use team_email
+                payload.username = formData.email; // We reuse the email state for the username input
             } else if (role === 'player') {
-                url = 'http://localhost:5000/api/players/login'; // Player login target mapping
-                payload.mobile_number = formData.email; // Usually players login with mobile? Or email
+                url = 'http://localhost:5000/api/players/login';
+                payload.username = formData.email; 
             }
 
             const res = await axios.post(url, payload);
@@ -91,14 +91,22 @@ const Login = () => {
                         {error && <div className="error-message">{error}</div>}
 
                         <div className="input-group">
-                            <label>{role === 'team' ? 'Team Email Address' : role === 'player' ? 'Player Contact / Email' : 'Email Address'}</label>
+                            <label>
+                                {role === 'team' ? 'Team Email Address' : 
+                                 role === 'player' ? 'Username' : 
+                                 'Email Address'}
+                            </label>
                             <input
-                                type="email"
+                                type={role === 'player' ? "text" : "email"}
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                placeholder={role === 'team' ? 'squad@example.com' : 'contact@example.com'}
+                                placeholder={
+                                    role === 'team' ? 'squad@example.com' : 
+                                    role === 'player' ? 'Enter your username' :
+                                    'contact@example.com'
+                                }
                             />
                         </div>
 

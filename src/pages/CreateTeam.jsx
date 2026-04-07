@@ -11,6 +11,7 @@ const CreateTeam = () => {
 
     const [formData, setFormData] = useState({
         team_name: '',
+        username: '',
         team_email: '',
         password: '',
         location: ''
@@ -45,6 +46,7 @@ const CreateTeam = () => {
         try {
             const data = new FormData();
             data.append('team_name', formData.team_name);
+            data.append('username', formData.username);
             data.append('team_email', formData.team_email);
             data.append('password', formData.password);
             data.append('location', formData.location);
@@ -117,6 +119,11 @@ const CreateTeam = () => {
                         <div className="input-group">
                             <label>Official Team Name *</label>
                             <input type="text" name="team_name" value={formData.team_name} onChange={handleChange} required placeholder="Gladiators BC" />
+                        </div>
+
+                        <div className="input-group">
+                            <label>Team Unique Handle (Username) *</label>
+                            <input type="text" name="username" value={formData.username} onChange={handleChange} required placeholder="gladiators_official" />
                         </div>
 
                         <div className="input-group">

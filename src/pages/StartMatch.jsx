@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import BattleLoader from '../components/BattleLoader';
 import './StartMatch.css';
 
 const StartMatch = () => {
@@ -75,14 +76,69 @@ const StartMatch = () => {
         }
     };
 
-    const handleStartMatch = async () => {
-        // In a real app, we would POST to /api/matches/slot-teams or similar
-        // For now, let's simulate the excitement!
-        alert(`🚀 MATCH ENGAGED! \n\n${slot1.team_name} vs ${slot2.team_name}\n\nRedirecting to Live Scoring System...`);
-        // navigate('/live-scoring'); // Future implementation
+    const handleGenerateSchedule = async (tournamentId) => {
+        try {
+            await axios.post('http://localhost:5000/api/matches/schedule', {
+                tournament_id: tournamentId,
+                total_matches: 5 // Create a small initial bracket
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert("Tournament schedule initialized with 5 match slots!");
+            handleStartMatch(); // Retry the flow
+        } catch (err) {
+            console.error("Initialization error:", err);
+            alert("Failed to initialize tournament schedule.");
+        }
     };
 
-    if (loading) return <div className="start-match-page">Syncing Arena Data...</div>;
+    const handleStartMatch = async () => {
+        if (!slot1 || !slot2) return;
+
+        try {
+            const tournamentId = slot1.tournament_id;
+            const res = await axios.get(`http://localhost:5000/api/matches/tournament/${tournamentId}`);
+            const matchesArr = res.data.matches || [];
+            
+            // Look for a scheduled match that is "open" (no teams yet)
+            let targetedMatch = matchesArr.find(m => m.status === 'scheduled' && !m.team1_id);
+            
+            // Fallback: Just look for any scheduled match if no "empty" ones found
+            if (!targetedMatch) {
+                targetedMatch = matchesArr.find(m => m.status === 'scheduled');
+            }
+
+            if (!targetedMatch) {
+                const message = matchesArr.length === 0 
+                    ? "No match slots found for this tournament. Create a schedule first?"
+                    : "All scheduled matches are already occupied. Add more match slots?";
+                
+                if (window.confirm(message)) {
+                    await handleGenerateSchedule(tournamentId);
+                }
+                return;
+            }
+
+            // 2. Assign these teams to the match in the backend
+            await axios.put(`http://localhost:5000/api/matches/${targetedMatch.id}/teams`, {
+                team1_id: slot1.team_id,
+                team2_id: slot2.team_id,
+                team1_name: slot1.team_name,
+                team2_name: slot2.team_name
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            // 3. Navigate to the Configuration page
+            navigate(`/match-config/${targetedMatch.id}`);
+        } catch (err) {
+            console.error("Match startup failure:", err);
+            const errMsg = err.response?.data?.error || err.message || "Failed to initialize match";
+            alert(`Error: ${errMsg}`);
+        }
+    };
+
+    if (loading) return <BattleLoader label="Syncing Arena Data..." />;
 
     return (
         <div className="start-match-page">

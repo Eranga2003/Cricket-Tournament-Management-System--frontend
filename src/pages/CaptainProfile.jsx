@@ -2,6 +2,8 @@ import React, { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './CaptainProfile.css';
+import BattleLoader from '../components/BattleLoader';
+
 
 const CaptainProfile = () => {
     const { user, role, logout, token, updateUser } = useContext(AuthContext);
@@ -29,7 +31,7 @@ const CaptainProfile = () => {
         fetchProfile();
     }, [token, role]);
 
-    if (loading) return <div className="loading-screen" style={{ color: 'white' }}>Establishing Secure Connection...</div>;
+    if (loading) return <BattleLoader label="Establishing Secure Connection..." />;
     if (!user || role !== 'captain') {
         return <div className="loading-screen">Unauthorized access. Please login as a Captain.</div>;
     }

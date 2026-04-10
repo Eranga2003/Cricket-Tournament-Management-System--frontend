@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './TeamProfile.css';
+import BattleLoader from '../components/BattleLoader';
 
 const TeamProfile = () => {
     const { user, role, token, updateUser } = useContext(AuthContext);
@@ -65,7 +66,7 @@ const TeamProfile = () => {
         setTimeout(() => setCopySuccess(''), 2500);
     };
 
-    if (loading) return <div className="loading-screen" style={{ color: 'white', padding: '5rem', textAlign: 'center' }}>Syncing Roster Data...</div>;
+    if (loading) return <BattleLoader label="Syncing Roster Data..." />;
 
     return (
         <div className="team-profile-container">

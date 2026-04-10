@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import './CaptainHome.css'; // Perfectly reuse the dark aesthetic grid
+import './CaptainHome.css';
+import BattleLoader from '../components/BattleLoader';
 import TournamentWeather from '../components/TournamentWeather';
 
 const TeamHome = () => {
@@ -40,7 +41,7 @@ const TeamHome = () => {
         setTimeout(() => setCopiedId(null), 2500);
     };
 
-    if (loading) return <div className="loading-screen" style={{ color: 'white', padding: '5rem', textAlign: 'center' }}>Syncing Member Feed...</div>;
+    if (loading) return <BattleLoader label="Syncing Member Feed..." />;
 
     return (
         <div className="captain-dashboard">

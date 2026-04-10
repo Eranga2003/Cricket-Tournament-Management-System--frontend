@@ -4,6 +4,8 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './CaptainHome.css';
 import TournamentWeather from '../components/TournamentWeather';
+import BattleLoader from '../components/BattleLoader';
+
 import ApplyTournamentModal from '../components/ApplyTournamentModal';
 
 const CaptainHome = () => {
@@ -75,7 +77,7 @@ const CaptainHome = () => {
         setAppliedIds(prev => [...prev, newReg.tournament_id]);
     };
 
-    if (loading) return <div className="loading-screen" style={{ color: 'white', padding: '5rem', textAlign: 'center' }}>Syncing CSCL Data...</div>;
+    if (loading) return <BattleLoader label="Syncing CSCL Data..." />;
 
     return (
         <div className="captain-dashboard">

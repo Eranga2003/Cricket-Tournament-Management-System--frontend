@@ -12,6 +12,8 @@ import JoinTeam from '../pages/JoinTeam';
 import CaptainProfile from '../pages/CaptainProfile';
 import ProtectedRoute from '../components/ProtectedRoute';
 import StartMatch from '../pages/StartMatch';
+import MatchConfig from '../pages/MatchConfig';
+import LiveScoring from '../pages/LiveScoring';
 
 const AppRoutes = () => {
     return (
@@ -52,6 +54,16 @@ const AppRoutes = () => {
             <Route path="/start-match" element={
                 <ProtectedRoute>
                     <StartMatch />
+                </ProtectedRoute>
+            } />
+            <Route path="/match-config/:matchId" element={
+                <ProtectedRoute>
+                    <MatchConfig />
+                </ProtectedRoute>
+            } />
+            <Route path="/live-scoring/:matchId" element={
+                <ProtectedRoute>
+                    <LiveScoring />
                 </ProtectedRoute>
             } />
             <Route path="/join-team/:teamId" element={<JoinTeam />} />

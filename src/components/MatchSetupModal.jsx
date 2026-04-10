@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import './MatchSetupModal.css';
 
 const MatchSetupModal = ({ isOpen, onClose, arrivedTeams }) => {
+    const { token } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [availableTeams, setAvailableTeams] = useState([]);
     const [slot1, setSlot1] = useState(null);
     const [slot2, setSlot2] = useState(null);
     const [dragOverZone, setDragOverZone] = useState(null);
     const [matchNumber, setMatchNumber] = useState(1);
     const [matchesStarted, setMatchesStarted] = useState([]);
+    const [isStarting, setIsStarting] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -68,22 +74,49 @@ const MatchSetupModal = ({ isOpen, onClose, arrivedTeams }) => {
         }
     };
 
-    const handleStartMatch = () => {
-        const matchData = {
-            id: Date.now(),
-            matchNumber,
-            team1: slot1,
-            team2: slot2,
-            startTime: new Date().toLocaleTimeString()
-        };
-
-        setMatchesStarted(prev => [...prev, matchData]);
-        alert(`Match ${matchNumber}: ${slot1.team_name} VS ${slot2.team_name} has officially started!`);
+    const handleStartMatch = async () => {
+        if (isStarting) return;
+        setIsStarting(true);
         
-        // Prepare for next match
-        setMatchNumber(prev => prev + 1);
-        setSlot1(null);
-        setSlot2(null);
+        try {
+            // First, establish the match record in the database
+            const res = await axios.post('http://localhost:5000/api/matches', {
+                tournament_id: slot1.tournament_id,
+                team1_id: slot1.id,
+                team2_id: slot2.id,
+                team1_name: slot1.team_name,
+                team2_name: slot2.team_name,
+                match_number: matchNumber
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const newMatchId = res.data.match.id;
+
+            // Prepare local history state (optional but good for UX)
+            const matchData = {
+                id: newMatchId,
+                matchNumber,
+                team1: slot1,
+                team2: slot2,
+                startTime: new Date().toLocaleTimeString()
+            };
+            setMatchesStarted(prev => [...prev, matchData]);
+
+            // Navigate to configuration to finalize rules and start scoring
+            navigate(`/match-config/${newMatchId}`);
+            onClose();
+            
+            // Cleanup
+            setMatchNumber(prev => prev + 1);
+            setSlot1(null);
+            setSlot2(null);
+        } catch (err) {
+            console.error("Match startup fail:", err);
+            alert(err.response?.data?.error || "Failed to establish the official match record.");
+        } finally {
+            setIsStarting(false);
+        }
     };
 
     if (!isOpen) return null;
@@ -192,8 +225,12 @@ const MatchSetupModal = ({ isOpen, onClose, arrivedTeams }) => {
                         </div>
 
                         {slot1 && slot2 && (
-                            <button className="start-battle-btn" onClick={handleStartMatch}>
-                                Start Official Match ⚡
+                            <button 
+                                className={`start-battle-btn ${isStarting ? 'loading' : ''}`} 
+                                onClick={handleStartMatch}
+                                disabled={isStarting}
+                            >
+                                {isStarting ? 'Establishing Battle...' : 'Start Official Match ⚡'}
                             </button>
                         )}
                     </main>

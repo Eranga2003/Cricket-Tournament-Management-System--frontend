@@ -7,6 +7,7 @@ import TournamentDetailsModal from '../components/TournamentDetailsModal';
 import TeamDetailsModal from '../components/TeamDetailsModal';
 import QRScannerModal from '../components/QRScannerModal';
 import MatchSetupModal from '../components/MatchSetupModal';
+import BattleLoader from '../components/BattleLoader';
 import './OrganizerDashboard.css';
 
 const OrganizerDashboard = () => {
@@ -100,7 +101,7 @@ const OrganizerDashboard = () => {
         init();
     }, [token]);
 
-    if (loading) return <div className="loading-screen" style={{ color: 'white' }}>Syncing Organizer Intelligence...</div>;
+    if (loading) return <BattleLoader label="Syncing Organizer Intelligence..." />;
 
     return (
         <div className="dashboard-container">

@@ -5,37 +5,48 @@ import axios from 'axios';
 import './TeamProfile.css';
 
 const TeamProfile = () => {
-    const { user, role, token } = useContext(AuthContext);
+    const { user, role, token, updateUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const [team, setTeam] = useState(null);
     const [players, setPlayers] = useState([]);
+    const [appliedTournaments, setAppliedTournaments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [copySuccess, setCopySuccess] = useState('');
 
     useEffect(() => {
         const fetchTeamDetails = async () => {
             try {
-                let currentTeam = null;
-                if (role === 'captain') {
-                    const tRes = await axios.get('http://localhost:5000/api/teams', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    const teams = tRes.data.teams || [];
-                    currentTeam = teams.find(t => t.captain_id === user.id);
-                } else if (role === 'team') {
-                    currentTeam = user;
-                }
-
+                // Fetch the absolute freshest team profile data from the server
+                const tRes = await axios.get('http://localhost:5000/api/teams/profile', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const currentTeam = tRes.data.team;
+                
                 if (currentTeam) {
                     setTeam(currentTeam);
+                    
+                    // Sync the local session if it's currently stale (if user role matches)
+                    if (role === 'team' || (role === 'captain' && user.id === currentTeam.captain_id)) {
+                        // We don't want to overwrite the captain's user object with team data, 
+                        // but if role is 'team', we should sync.
+                        if (role === 'team') updateUser(currentTeam);
+                    }
+
                     const pRes = await axios.get(`http://localhost:5000/api/players/team/${currentTeam.id}`);
                     setPlayers(pRes.data.players || []);
-                } else {
-                    navigate(role === 'team' ? '/team-home' : '/captain-home'); // fallback
+                    
+                    // Fetch applied tournaments
+                    const regRes = await axios.get('http://localhost:5000/api/registrations/my', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setAppliedTournaments(regRes.data.registrations || []);
                 }
             } catch (err) {
                 console.error("Error fetching Team details:", err);
+                if (err.response?.status === 404) {
+                    navigate(role === 'team' ? '/team-home' : '/captain-home');
+                }
             } finally {
                 setLoading(false);
             }
@@ -110,6 +121,66 @@ const TeamProfile = () => {
                             <button className="copy-btn" onClick={handleCopy}>
                                 {copySuccess || 'Copy Invite Link'}
                             </button>
+                        </div>
+                    </div>
+
+                    <div className="registrations-section glass-card">
+                        <h2>Applied Tournaments</h2>
+                        <div className="table-responsive">
+                            {appliedTournaments.length === 0 ? (
+                                <p className="empty-state">No tournament applications submitted yet.</p>
+                            ) : (
+                                <table className="roster-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tournament Name</th>
+                                            <th>Status</th>
+                                            <th>Match QR</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {appliedTournaments.map(reg => (
+                                            <tr key={reg.id}>
+                                                <td>
+                                                    <div className="tournament-info-cell">
+                                                        <strong>{reg.tournament_name}</strong>
+                                                        <br />
+                                                        <small>{new Date(reg.tournament_date).toLocaleDateString()}</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span className={`status-badge ${reg.status}`}>
+                                                        {reg.status.charAt(0).toUpperCase() + reg.status.slice(1)}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {reg.status === 'approved' && reg.qr_code ? (
+                                                        <div className="qr-container">
+                                                            <img src={reg.qr_code} alt="Entry QR" className="entry-qr-mini" />
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted">Not Available</span>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    {reg.status === 'approved' && reg.qr_code && (
+                                                        <a 
+                                                            href={reg.qr_code} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="download-qr-btn"
+                                                            download={`QR_${reg.id}.png`}
+                                                        >
+                                                            Download QR
+                                                        </a>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
 

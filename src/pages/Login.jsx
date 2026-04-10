@@ -92,20 +92,16 @@ const Login = () => {
 
                         <div className="input-group">
                             <label>
-                                {role === 'team' ? 'Team Email Address' : 
-                                 role === 'player' ? 'Username' : 
-                                 'Email Address'}
+                                {(role === 'team' || role === 'player') ? 'Username' : 'Email Address'}
                             </label>
                             <input
-                                type={role === 'player' ? "text" : "email"}
+                                type={(role === 'team' || role === 'player') ? "text" : "email"}
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
                                 placeholder={
-                                    role === 'team' ? 'squad@example.com' : 
-                                    role === 'player' ? 'Enter your username' :
-                                    'contact@example.com'
+                                    (role === 'team' || role === 'player') ? 'Enter your unique handle' : 'e.g. contact@example.com'
                                 }
                             />
                         </div>

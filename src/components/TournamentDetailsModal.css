@@ -1,0 +1,211 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 2rem;
+}
+
+.modal-content {
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2.5rem !important;
+    background: linear-gradient(145deg, rgba(30, 30, 50, 0.95), rgba(15, 15, 30, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: modal-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-enter {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #a0a0b0;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #ff2e93;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.detail-item label {
+    display: block;
+    font-size: 0.8rem;
+    color: #8fa0c0;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 0.5rem;
+}
+
+.detail-item p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.prizes-section, .contacts-section, .gallery-section, .share-section {
+    margin-bottom: 3rem;
+}
+
+.prizes-section h3, .contacts-section h3, .gallery-section h3, .share-section h3 {
+    font-size: 1.1rem;
+    color: #00e1ff;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.prize-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prize-card span {
+    display: block;
+    font-size: 0.9rem;
+    color: #a0a0b0;
+    margin-bottom: 0.4rem;
+}
+
+.prize-card strong {
+    font-size: 1.4rem;
+}
+
+.prize-card.gold { border-color: #ffd700; color: #ffd700; background: rgba(255, 215, 0, 0.05); }
+.prize-card.silver { border-color: #c0c0c0; color: #c0c0c0; background: rgba(192, 192, 192, 0.05); }
+.prize-card.bronze { border-color: #cd7f32; color: #cd7f32; background: rgba(205, 127, 50, 0.05); }
+
+.contact-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.contact-tag {
+    background: rgba(0, 225, 255, 0.1);
+    color: #00e1ff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 225, 255, 0.3);
+    font-weight: 600;
+}
+
+.image-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+.gallery-img {
+    height: 180px;
+    min-width: 280px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.link-box {
+    display: flex;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.link-box code {
+    flex: 1;
+    color: #8fa0c0;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    padding-right: 1rem;
+}
+
+.copy-link-btn {
+    background: #7000ff;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.copy-link-btn:hover {
+    background: #8a2be2;
+    transform: translateY(-2px);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.done-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #8fa0c0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 2.5rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.done-btn:hover {
+    border-color: rgba(0, 225, 255, 0.6);
+    color: #00e1ff;
+    background: rgba(0, 225, 255, 0.1);
+}
+
+@media (max-width: 600px) {
+    .prizes-grid { grid-template-columns: 1fr; }
+    .link-box { flex-direction: column; align-items: stretch; }
+    .modal-content { padding: 1.5rem !important; }
+}

@@ -12,7 +12,6 @@ const CreateTeam = () => {
     const [formData, setFormData] = useState({
         team_name: '',
         username: '',
-        team_email: '',
         password: '',
         location: ''
     });
@@ -47,7 +46,6 @@ const CreateTeam = () => {
             const data = new FormData();
             data.append('team_name', formData.team_name);
             data.append('username', formData.username);
-            data.append('team_email', formData.team_email);
             data.append('password', formData.password);
             data.append('location', formData.location);
             data.append('captain_id', user.id);
@@ -127,8 +125,8 @@ const CreateTeam = () => {
                         </div>
 
                         <div className="input-group">
-                            <label>Team Email (Used for separate team login) *</label>
-                            <input type="email" name="team_email" value={formData.team_email} onChange={handleChange} required placeholder="gladiators@example.com" />
+                            <label>Team Profile Password *</label>
+                            <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Create secure password for team login" />
                         </div>
 
                         <div className="input-group">

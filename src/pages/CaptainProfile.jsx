@@ -4,10 +4,32 @@ import { useNavigate } from 'react-router-dom';
 import './CaptainProfile.css';
 
 const CaptainProfile = () => {
-    const { user, role, logout } = useContext(AuthContext);
+    const { user, role, logout, token, updateUser } = useContext(AuthContext);
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState('personal'); // 'personal' or 'team'
+    const [loading, setLoading] = useState(true);
 
+    React.useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                if (token && role === 'captain') {
+                    const res = await axios.get('http://localhost:5000/api/captains/profile', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (res.data) {
+                        updateUser(res.data);
+                    }
+                }
+            } catch (err) {
+                console.error("Profile sync fail:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, [token, role]);
+
+    if (loading) return <div className="loading-screen" style={{ color: 'white' }}>Establishing Secure Connection...</div>;
     if (!user || role !== 'captain') {
         return <div className="loading-screen">Unauthorized access. Please login as a Captain.</div>;
     }

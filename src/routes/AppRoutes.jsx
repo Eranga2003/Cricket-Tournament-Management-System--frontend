@@ -11,6 +11,7 @@ import TeamProfile from '../pages/TeamProfile';
 import JoinTeam from '../pages/JoinTeam';
 import CaptainProfile from '../pages/CaptainProfile';
 import ProtectedRoute from '../components/ProtectedRoute';
+import StartMatch from '../pages/StartMatch';
 
 const AppRoutes = () => {
     return (
@@ -46,6 +47,11 @@ const AppRoutes = () => {
             <Route path="/captain-profile" element={
                 <ProtectedRoute>
                     <CaptainProfile />
+                </ProtectedRoute>
+            } />
+            <Route path="/start-match" element={
+                <ProtectedRoute>
+                    <StartMatch />
                 </ProtectedRoute>
             } />
             <Route path="/join-team/:teamId" element={<JoinTeam />} />

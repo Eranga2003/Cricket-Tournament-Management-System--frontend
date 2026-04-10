@@ -1,0 +1,99 @@
+.team-details-modal {
+    max-width: 900px !important;
+    width: 95% !important;
+    padding: 2.5rem !important;
+    background: linear-gradient(145deg, rgba(20, 25, 45, 0.95), rgba(15, 20, 40, 0.95));
+}
+
+.team-header-info {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.details-team-logo,
+.details-logo-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    box-shadow: 0 0 30px rgba(0, 225, 255, 0.4);
+}
+
+.details-logo-placeholder {
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.team-header-info .info-text h3 {
+    font-size: 2.2rem;
+    margin-bottom: 0.8rem;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 225, 255, 0.3);
+}
+
+.location-tag {
+    color: #8fa0c0;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+}
+
+.contact-info {
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.contact-info strong {
+    color: #00ffaa;
+}
+
+.squad-section h3 {
+    font-size: 1.2rem;
+    color: #00e1ff;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.mini-table th {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+}
+
+.player-cell {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.mini-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.role-badge {
+    background: rgba(112, 0, 255, 0.1);
+    color: #b18dff;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid rgba(112, 0, 255, 0.4);
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+@media (max-width: 650px) {
+    .team-header-info {
+        flex-direction: column;
+        text-align: center;
+    }
+}

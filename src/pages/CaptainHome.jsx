@@ -7,7 +7,7 @@ import TournamentWeather from '../components/TournamentWeather';
 import ApplyTournamentModal from '../components/ApplyTournamentModal';
 
 const CaptainHome = () => {
-    const { user, token, role, logout } = useContext(AuthContext);
+    const { user, token, role, logout, updateUser } = useContext(AuthContext);
     const navigate = useNavigate();
     const [tournaments, setTournaments] = useState([]);
     const [myTeam, setMyTeam] = useState(null);
@@ -18,21 +18,25 @@ const CaptainHome = () => {
 
     const initData = async () => {
         try {
-            // 1. Team Context Binding
-            if (role === 'captain') {
-                const teamRes = await axios.get('http://localhost:5000/api/teams', {
+            // 1. Team Context Binding - Force a live fetch instead of relying on stale session
+            try {
+                const teamRes = await axios.get('http://localhost:5000/api/teams/profile', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                const teams = teamRes.data.teams || [];
-                const foundTeam = teams.find(t => t.captain_id === user.id);
+                const foundTeam = teamRes.data.team;
+                setMyTeam(foundTeam);
 
-                if (!foundTeam) {
-                    navigate('/create-team'); // Intercept! Breakout to team creation
+                // Sync local session if we are logged in as a Team natively
+                // Check if data actually changed to prevent infinite loops
+                if (role === 'team' && JSON.stringify(foundTeam) !== JSON.stringify(user)) {
+                    updateUser(foundTeam);
+                }
+            } catch (teamErr) {
+                if (teamErr.response?.status === 404 && role === 'captain') {
+                    navigate('/create-team');
                     return;
                 }
-                setMyTeam(foundTeam);
-            } else if (role === 'team') {
-                setMyTeam(user); // If logged in via the Team Auth native route directly
+                console.error("Team discovery fail:", teamErr);
             }
 
             // 2. Fetch The Upcoming Tournaments Grid
@@ -57,10 +61,10 @@ const CaptainHome = () => {
     };
 
     useEffect(() => {
-        if (user && token) {
+        if (token) {
             initData();
         }
-    }, [user, role, token, navigate]);
+    }, [token, role]);
 
     const handleApplyClick = (tournament) => {
         setSelectedTournament(tournament);

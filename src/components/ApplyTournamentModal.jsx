@@ -15,6 +15,21 @@ const ApplyTournamentModal = ({ tournament, team, isOpen, onClose, onApplySucces
         payment_done: false
     });
 
+    // Reset state only when the modal is opened
+    useEffect(() => {
+        if (isOpen) {
+            setStep(1);
+            setSelectedPlayerIds([]);
+            setFormData({
+                team_name: team?.team_name || '',
+                contact_number: '',
+                payment_done: false
+            });
+            setError(null);
+        }
+    }, [isOpen]);
+
+    // Fetch players independently
     useEffect(() => {
         const fetchPlayers = async () => {
             if (!team?.id || !isOpen) return;
@@ -23,23 +38,17 @@ const ApplyTournamentModal = ({ tournament, team, isOpen, onClose, onApplySucces
                 const res = await axios.get(`http://localhost:5000/api/players/team/${team.id}`);
                 setPlayers(res.data.players || []);
             } catch (err) {
+                console.error("Fetch players error:", err);
                 setError("Failed to load your squad roster. Please try again.");
             } finally {
                 setLoading(false);
             }
         };
 
-        if (isOpen) {
+        if (isOpen && team?.id) {
             fetchPlayers();
-            setStep(1);
-            setSelectedPlayerIds([]);
-            setFormData({
-                team_name: team?.team_name || '',
-                contact_number: '',
-                payment_done: false
-            });
         }
-    }, [team, isOpen]);
+    }, [isOpen, team?.id]);
 
     const togglePlayer = (id) => {
         setSelectedPlayerIds(prev => 

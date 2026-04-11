@@ -806,21 +806,80 @@
 }
 
 .winner-star-row {
-  border-left: 4px solid var(--neon-green) !important;
-  background: rgba(57, 255, 20, 0.03) !important;
-}
-
-.winner-star-row.bowl {
-  border-left-color: var(--neon-green) !important;
+  border-left: 3px solid var(--neon-green) !important;
+  background: rgba(57, 255, 20, 0.05) !important;
+  position: relative;
 }
 
 @keyframes winnerPulse {
-  0% { border-left-width: 4px; }
-  50% { border-left-width: 8px; background: rgba(57, 255, 20, 0.06) !important; }
-  100% { border-left-width: 4px; }
+  0% { background: rgba(57, 255, 20, 0.04) !important; }
+  50% { background: rgba(57, 255, 20, 0.1) !important; }
+  100% { background: rgba(57, 255, 20, 0.04) !important; }
 }
 
 .winner-star-row {
-  animation: winnerPulse 2s infinite ease-in-out;
+  animation: winnerPulse 3s infinite ease-in-out;
+}
+
+.summary-table.master tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.summary-table.master .bold {
+  color: white;
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+.team-split-header {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.07) 50%, rgba(255, 255, 255, 0.02) 100%) !important;
+  color: var(--neon-blue);
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 6px;
+  border-bottom: 2px solid rgba(0, 225, 255, 0.1);
+  text-shadow: 0 0 15px rgba(0, 225, 255, 0.4);
+}
+
+.team-split-header td {
+  padding: 1.5rem 1rem !important;
+  text-align: center;
+}
+
+.player-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.badge-rack {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.dim-text {
+  color: #475569;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.status-tag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+}
+
+.status-tag.out { color: var(--wicket-red); border-color: rgba(255, 68, 68, 0.3); }
+.status-tag.not-out { color: var(--neon-green); border-color: rgba(57, 255, 20, 0.3); }
+
+.mvp-badge {
+  font-size: 0.6rem;
+  margin-left: 0;
+  padding: 0.2rem 0.5rem;
 }
 

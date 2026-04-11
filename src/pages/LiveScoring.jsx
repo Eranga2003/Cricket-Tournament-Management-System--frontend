@@ -29,6 +29,7 @@ const LiveScoring = () => {
     const [showTransitionSelector, setShowTransitionSelector] = useState(false);
     const [showExtraModal, setShowExtraModal] = useState(false);
     const [pendingExtraType, setPendingExtraType] = useState(null);
+    const [isFinalizing, setIsFinalizing] = useState(false);
 
     const [s2Striker, setS2Striker] = useState('');
     const [s2NonStriker, setS2NonStriker] = useState('');
@@ -176,24 +177,51 @@ const LiveScoring = () => {
         finally { setIsSyncing(false); }
     };
 
+    const handleFinalizeMatch = async () => {
+        if (!window.confirm("Finalize match and archive results? This cannot be undone.")) return;
+        setIsFinalizing(true);
+        try {
+            await axios.post(`http://localhost:5000/api/scoring/${matchId}/finalize`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            navigate('/organizer-dashboard');
+        } catch (err) {
+            alert(`Finalization Error: ${err.response?.data?.error || "Archival failed"}`);
+        } finally {
+            setIsFinalizing(false);
+        }
+    };
+
     const getChartData = () => {
-        if (!liveScore) return [];
-        const h1 = liveScore.innings1_history || [];
-        const h2 = liveScore.ball_history || [];
-        const maxBalls = Math.max(h1.length, h2.length);
+        if (!liveScore || !match) return [];
+        const isInn1 = liveScore.innings_number === 1;
+        const h1 = isInn1 ? liveScore.ball_history : (liveScore.innings1_history || []);
+        const h2 = isInn1 ? [] : (liveScore.ball_history || []);
         
+        // Find which team name corresponds to which innings
+        const t1Id = String(match.team1_id);
+        const t1Name = match.team1_name || 'Team 1';
+        const t2Name = match.team2_name || 'Team 2';
+
+        const inn1TeamId = isInn1 ? liveScore.batting_team_id : liveScore.innings1_team_id;
+        const inn1Name = String(inn1TeamId) === t1Id ? t1Name : t2Name;
+        const inn2Name = inn1Name === t1Name ? t2Name : t1Name;
+
+        const maxBalls = Math.max(h1.length, h2.length);
         let data = [];
-        let cumA = 0;
-        let cumB = 0;
+        let cum1 = 0;
+        let cum2 = 0;
         
         for (let i = 0; i < maxBalls; i++) {
-            if (h1[i]) cumA += (h1[i].runs || 0) + (h1[i].extra ? 1 : 0);
-            if (h2[i]) cumB += (h2[i].runs || 0) + (h2[i].extra ? 1 : 0);
+            if (h1[i]) cum1 += (h1[i].runs || 0) + (h1[i].extra ? 1 : 0);
+            if (h2[i]) cum2 += (h2[i].runs || 0) + (h2[i].extra ? 1 : 0);
             
             data.push({
                 ball: i + 1,
-                [match?.team1_name || 'Team A']: i < h1.length ? cumA : null,
-                [match?.team2_name || 'Team B']: i < h2.length ? cumB : null
+                inn1Score: i < h1.length ? cum1 : null,
+                inn2Score: i < h2.length ? cum2 : null,
+                inn1Team: inn1Name,
+                inn2Team: inn2Name
             });
         }
         return data;
@@ -222,6 +250,11 @@ const LiveScoring = () => {
         const remainingBalls = (liveScore.total_overs * liveScore.balls_per_over) - totalBalls;
         requiredRR = remainingBalls > 0 ? ((remainingRuns / remainingBalls) * liveScore.balls_per_over).toFixed(2) : "0.00";
     }
+
+    // Determine current inn names for Line Chart names
+    const inn1TeamIdForLine = liveScore.innings_number === 1 ? liveScore.batting_team_id : liveScore.innings1_team_id;
+    const inn1LineName = String(inn1TeamIdForLine) === String(match?.team1_id) ? match?.team1_name : match?.team2_name;
+    const inn2LineName = inn1LineName === match?.team1_name ? match?.team2_name : match?.team1_name;
 
     return (
         <div className={`live-scoring-page ${isSyncing ? 'is-syncing' : ''}`}>
@@ -450,6 +483,56 @@ const LiveScoring = () => {
                                 if (String(winnerId) === String(match?.team1_id)) findWinnerBest(t1Squad);
                                 else if (String(winnerId) === String(match?.team2_id)) findWinnerBest(t2Squad);
 
+                                const renderBatterRow = (p) => {
+                                    const stats = combinedStats[p.id] || { runs: 0, balls: 0 };
+                                    const sr = stats.balls > 0 ? ((stats.runs / stats.balls) * 100).toFixed(1) : "0.0";
+                                    const out = combinedWickets.includes(String(p.id));
+                                    const isMatchMVP = String(match?.best_batsman_id) === String(p.id);
+                                    const isWinnerMVP = String(winnerBestBatterId) === String(p.id);
+
+                                    return (
+                                        <tr key={p.id} className={`${isMatchMVP ? 'mvp-row animate-glow' : ''} ${isWinnerMVP ? 'winner-star-row' : ''}`}>
+                                            <td>
+                                                <div className="player-cell">
+                                                    {p.name} 
+                                                    <div className="badge-rack">
+                                                        {isMatchMVP && <span className="mvp-badge">⚡ MVP</span>}
+                                                        {isWinnerMVP && <span className="mvp-badge champion">🏆 CHAMPION'S BEST</span>}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="bold">{stats.runs}</td>
+                                            <td>{stats.balls}</td>
+                                            <td className="dim-text">{sr}</td>
+                                            <td><span className={`status-tag ${out ? 'out' : 'not-out'}`}>{out ? 'Out' : 'Not Out'}</span></td>
+                                        </tr>
+                                    );
+                                };
+
+                                const renderBowlerRow = (p) => {
+                                    const stats = combinedStats[p.id] || { wickets: 0, runs_conceded: 0, balls_bowled: 0 };
+                                    const econ = stats.balls_bowled > 0 ? ((stats.runs_conceded / stats.balls_bowled) * 6).toFixed(2) : "0.00";
+                                    const isMatchMVP = String(match?.best_bowler_id) === String(p.id);
+                                    const isWinnerMVP = String(winnerBestBowlerId) === String(p.id);
+
+                                    return (
+                                        <tr key={p.id} className={`${isMatchMVP ? 'mvp-row-bowler animate-glow-bowl' : ''} ${isWinnerMVP ? 'winner-star-row bowl' : ''}`}>
+                                            <td>
+                                                <div className="player-cell">
+                                                    {p.name} 
+                                                    <div className="badge-rack">
+                                                        {isMatchMVP && <span className="mvp-badge bowl">🎯 MVP</span>}
+                                                        {isWinnerMVP && <span className="mvp-badge champion bowl">🏆 CHAMPION'S BEST</span>}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="bold">{stats.wickets}</td>
+                                            <td>{stats.runs_conceded}</td>
+                                            <td className="dim-text">{econ}</td>
+                                        </tr>
+                                    );
+                                };
+
                                 return (
                                     <>
                                         <div className="scorecard-viz">
@@ -458,34 +541,12 @@ const LiveScoring = () => {
                                                 {match?.winner_team_id && <span className="winner-tag-info">Highlighting {winningTeamName} Stars</span>}
                                             </div>
                                             <table className="summary-table master">
-                                                <thead><tr><th>Batsman</th><th>Team</th><th>Runs</th><th>Balls</th><th>SR</th><th>Status</th></tr></thead>
+                                                <thead><tr><th>Batsman</th><th>Runs</th><th>Balls</th><th>SR</th><th>Status</th></tr></thead>
                                                 <tbody>
-                                                    {[
-                                                        ...t1Squad.map(p => ({ ...p, team: t1Name })),
-                                                        ...t2Squad.map(p => ({ ...p, team: t2Name }))
-                                                    ].map(p => { 
-                                                        const stats = combinedStats[p.id] || { runs: 0, balls: 0 };
-                                                        const sr = stats.balls > 0 ? ((stats.runs / stats.balls) * 100).toFixed(1) : "0.0";
-                                                        const out = combinedWickets.includes(String(p.id));
-                                                        const isMatchMVP = String(match?.best_batsman_id) === String(p.id);
-                                                        const isWinnerMVP = String(winnerBestBatterId) === String(p.id);
-
-                                                        if (stats.balls === 0 && !out) return null;
-                                                        return (
-                                                            <tr key={p.id} className={`${isMatchMVP ? 'mvp-row animate-glow' : ''} ${isWinnerMVP ? 'winner-star-row' : ''}`}>
-                                                                <td>
-                                                                    {p.name} 
-                                                                    {isMatchMVP && <span className="mvp-badge">⚡ MVP</span>}
-                                                                    {isWinnerMVP && <span className="mvp-badge champion">🏆 CHAMPION'S BEST</span>}
-                                                                </td>
-                                                                <td><span className={`team-tag ${p.team === t1Name ? 't1' : 't2'}`}>{p.team}</span></td>
-                                                                <td className="bold">{stats.runs}</td>
-                                                                <td>{stats.balls}</td>
-                                                                <td>{sr}</td>
-                                                                <td><span className={`status-tag ${out ? 'out' : 'not-out'}`}>{out ? 'Out' : 'Not Out'}</span></td>
-                                                            </tr>
-                                                        );
-                                                    })}
+                                                    <tr className="team-split-header"><td colSpan="5">{t1Name}</td></tr>
+                                                    {t1Squad.map(renderBatterRow)}
+                                                    <tr className="team-split-header"><td colSpan="5">{t2Name}</td></tr>
+                                                    {t2Squad.map(renderBatterRow)}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -495,32 +556,12 @@ const LiveScoring = () => {
                                                 <h3>Match Bowling Force</h3>
                                             </div>
                                             <table className="summary-table master">
-                                                <thead><tr><th>Bowler</th><th>Team</th><th>Wkts</th><th>Runs</th><th>Econ</th></tr></thead>
+                                                <thead><tr><th>Bowler</th><th>Wkts</th><th>Runs</th><th>Econ</th></tr></thead>
                                                 <tbody>
-                                                    {[
-                                                        ...t1Squad.map(p => ({ ...p, team: t1Name })),
-                                                        ...t2Squad.map(p => ({ ...p, team: t2Name }))
-                                                    ].map(p => {
-                                                        const stats = combinedStats[p.id] || { wickets: 0, runs_conceded: 0, balls_bowled: 0 };
-                                                        const econ = stats.balls_bowled > 0 ? ((stats.runs_conceded / stats.balls_bowled) * 6).toFixed(2) : "0.00";
-                                                        const isMatchMVP = String(match?.best_bowler_id) === String(p.id);
-                                                        const isWinnerMVP = String(winnerBestBowlerId) === String(p.id);
-
-                                                        if (stats.balls_bowled === 0) return null;
-                                                        return (
-                                                            <tr key={p.id} className={`${isMatchMVP ? 'mvp-row-bowler animate-glow-bowl' : ''} ${isWinnerMVP ? 'winner-star-row bowl' : ''}`}>
-                                                                <td>
-                                                                    {p.name} 
-                                                                    {isMatchMVP && <span className="mvp-badge bowl">🎯 MVP</span>}
-                                                                    {isWinnerMVP && <span className="mvp-badge champion bowl">🏆 CHAMPION'S BEST</span>}
-                                                                </td>
-                                                                <td><span className={`team-tag ${p.team === t1Name ? 't1' : 't2'}`}>{p.team}</span></td>
-                                                                <td className="bold">{stats.wickets}</td>
-                                                                <td>{stats.runs_conceded}</td>
-                                                                <td>{econ}</td>
-                                                            </tr>
-                                                        );
-                                                    })}
+                                                    <tr className="team-split-header"><td colSpan="4">{t1Name}</td></tr>
+                                                    {t1Squad.map(renderBowlerRow)}
+                                                    <tr className="team-split-header"><td colSpan="4">{t2Name}</td></tr>
+                                                    {t2Squad.map(renderBowlerRow)}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -542,8 +583,8 @@ const LiveScoring = () => {
                                                             contentStyle={{ background: '#0d1117', border: '1px solid var(--neon-blue)', borderRadius: '12px' }}
                                                         />
                                                         <Legend verticalAlign="top"/>
-                                                        <Line type="monotone" dataKey={match?.team1_name || 'Team A'} stroke="var(--neon-pink)" strokeWidth={3} dot={false} connectNulls />
-                                                        <Line type="monotone" dataKey={match?.team2_name || 'Team B'} stroke="var(--neon-blue)" strokeWidth={3} dot={false} connectNulls />
+                                                        <Line type="monotone" dataKey="inn1Score" name={inn1LineName} stroke="var(--neon-pink)" strokeWidth={3} dot={false} connectNulls />
+                                                        <Line type="monotone" dataKey="inn2Score" name={inn2LineName} stroke="var(--neon-blue)" strokeWidth={3} dot={false} connectNulls />
                                                     </LineChart>
                                                 </ResponsiveContainer>
                                             </div>
@@ -585,7 +626,9 @@ const LiveScoring = () => {
                                     {isSyncing ? 'Syncing...' : showTransitionSelector ? 'Start Chase ⚡' : 'Proceed to Innings 2 →'}
                                 </button>
                             ) : (
-                                <button className="prime-action-btn alt" onClick={() => window.location.reload()}>Finish Match & Return</button>
+                                <button className="prime-action-btn alt" onClick={handleFinalizeMatch} disabled={isFinalizing || isSyncing}>
+                                    {isFinalizing ? 'Archiving...' : 'Finish Match & Return'}
+                                </button>
                             )}
                         </div>
                     </div>

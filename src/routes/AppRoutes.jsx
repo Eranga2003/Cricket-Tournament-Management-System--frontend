@@ -14,6 +14,9 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import StartMatch from '../pages/StartMatch';
 import MatchConfig from '../pages/MatchConfig';
 import LiveScoring from '../pages/LiveScoring';
+import MatchHistory from '../pages/MatchHistory';
+import LiveMatches from '../pages/LiveMatches';
+import LiveMatchView from '../pages/LiveMatchView';
 
 const AppRoutes = () => {
     return (
@@ -67,6 +70,9 @@ const AppRoutes = () => {
                 </ProtectedRoute>
             } />
             <Route path="/join-team/:teamId" element={<JoinTeam />} />
+            <Route path="/match-history" element={<MatchHistory />} />
+            <Route path="/live-matches" element={<LiveMatches />} />
+            <Route path="/live-match/:matchId" element={<LiveMatchView />} />
         </Routes>
     );
 };

@@ -1,0 +1,170 @@
+:root {
+  --neon-blue: #00e1ff;
+  --neon-pink: #ff2e93;
+  --neon-green: #39ff14;
+  --neon-purple: #bc13fe;
+  --glass-bg: rgba(13, 17, 23, 0.8);
+  --card-border: rgba(255, 255, 255, 0.1);
+}
+
+.match-history-page {
+  min-height: 100vh;
+  background: #030712;
+  color: white;
+  padding: 3rem 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.history-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.history-header h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg, #fff, var(--neon-blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.history-feed {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.history-card {
+  border-radius: 30px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  transition: transform 0.3s ease;
+}
+
+.history-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--neon-blue);
+}
+
+.card-winner-header {
+  padding: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  background: radial-gradient(circle at center, rgba(0, 225, 255, 0.1) 0%, transparent 70%);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.winner-team-info {
+  text-align: center;
+}
+
+.winner-logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 2px solid var(--neon-green);
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+  margin-bottom: 1rem;
+}
+
+.winner-name {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--neon-green);
+  text-transform: uppercase;
+}
+
+.card-match-summary {
+  padding: 2rem;
+  text-align: center;
+}
+
+.summary-text {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.mvp-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.mvp-card {
+  background: rgba(13, 17, 23, 0.5);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.mvp-card.batter { border-color: rgba(0, 225, 255, 0.3); }
+.mvp-card.bowler { border-color: rgba(255, 46, 147, 0.3); }
+
+.mvp-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #1e293b;
+}
+
+.mvp-info h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 2px;
+  margin-bottom: 0.4rem;
+}
+
+.mvp-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.mvp-stats {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--neon-blue);
+}
+
+.mvp-stats.pink { color: var(--neon-pink); }
+
+.back-home-btn {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s;
+}
+
+.back-home-btn:hover {
+  background: white;
+  color: black;
+}
+
+@media (max-width: 768px) {
+  .mvp-section { grid-template-columns: 1fr; }
+}

@@ -47,7 +47,11 @@ const TeamHome = () => {
         <div className="captain-dashboard">
             <nav className="dashboard-nav">
                 <div className="nav-brand gradient-text">Squad Profile & Tournaments</div>
-                <button className="logout-btn" onClick={logout}>Logout Exit</button>
+                <div className="nav-actions" style={{display: 'flex', gap: '1.5rem', alignItems: 'center'}}>
+                    <div className="nav-link gradient-text" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: '800' }} onClick={() => navigate('/live-matches')}>📺 Live Arena</div>
+                    <div className="nav-link gradient-text" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: '800' }} onClick={() => navigate('/match-history')}>📜 Match History</div>
+                    <button className="logout-btn" onClick={logout}>Logout Exit</button>
+                </div>
             </nav>
 
             <header className="squad-header glass-card" style={{ cursor: 'pointer', border: '1px solid rgba(0, 225, 255, 0.3)' }} onClick={() => navigate('/team-profile')}>

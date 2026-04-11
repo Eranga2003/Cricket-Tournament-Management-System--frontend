@@ -85,6 +85,8 @@ const CaptainHome = () => {
                 <div className="nav-brand-group">
                     <div className="nav-brand gradient-text" style={{ cursor: 'pointer' }} onClick={() => navigate('/team-profile')}>Squad Profile</div>
                     <div className="nav-brand gradient-text" style={{ cursor: 'pointer' }} onClick={() => navigate('/captain-profile')}>My Profile</div>
+                    <div className="nav-link gradient-text" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: '800' }} onClick={() => navigate('/live-matches')}>📺 Live Arena</div>
+                    <div className="nav-link gradient-text" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: '800' }} onClick={() => navigate('/match-history')}>📜 Match History</div>
                 </div>
                 <button className="logout-btn" onClick={logout}>Logout Exit</button>
             </nav>

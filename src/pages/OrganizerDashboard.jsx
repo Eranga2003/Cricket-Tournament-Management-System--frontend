@@ -107,7 +107,11 @@ const OrganizerDashboard = () => {
         <div className="dashboard-container">
             <nav className="dashboard-nav">
                 <div className="nav-brand gradient-text">CSCL Organizer Hub</div>
-                <button className="logout-btn" onClick={logout}>Logout</button>
+                <div className="nav-actions" style={{display: 'flex', gap: '1.5rem', alignItems: 'center'}}>
+                    <div className="nav-link gradient-text" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: '800' }} onClick={() => navigate('/live-matches')}>📺 Live Arena</div>
+                    <div className="nav-link gradient-text" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: '800' }} onClick={() => navigate('/match-history')}>📜 Match History</div>
+                    <button className="logout-btn" onClick={logout}>Logout</button>
+                </div>
             </nav>
 
             <main className="dashboard-content">

@@ -105,4 +105,54 @@ a:hover {
 @keyframes text-fade {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; color: var(--primary-blue); }
-}
+}
+
+/* --- Premium Navigation Buttons --- */
+.premium-nav-btn {
+  padding: 0.8rem 1.6rem;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(13, 17, 23, 0.8);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.premium-nav-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+}
+
+.premium-nav-btn.live {
+  border: 2px solid var(--primary-blue);
+  color: var(--primary-blue);
+  background: rgba(0, 225, 255, 0.05);
+}
+
+.premium-nav-btn.live:hover {
+  background: linear-gradient(135deg, var(--primary-blue), #39ff14);
+  color: #030712;
+  border-color: #39ff14;
+  box-shadow: 0 0 30px rgba(0, 225, 255, 0.4);
+}
+
+.premium-nav-btn.history {
+  border: 2px solid var(--primary-purple);
+  color: var(--primary-purple);
+  background: rgba(112, 0, 255, 0.05);
+}
+
+.premium-nav-btn.history:hover {
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+  color: white;
+  border-color: var(--primary-pink);
+  box-shadow: 0 0 30px rgba(112, 0, 255, 0.4);
+}

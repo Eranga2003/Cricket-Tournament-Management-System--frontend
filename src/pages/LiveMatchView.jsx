@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import {
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
 import BattleLoader from '../components/BattleLoader';
 import './LiveScoring.css'; 
 
@@ -66,6 +69,45 @@ const LiveMatchView = () => {
         const remainingBalls = (liveScore.total_overs * liveScore.balls_per_over) - totalBalls;
         requiredRR = remainingBalls > 0 ? ((remainingRuns / remainingBalls) * liveScore.balls_per_over).toFixed(2) : "0.00";
     }
+
+    const getChartData = () => {
+        if (!liveScore || !match) return [];
+        const isInn1 = liveScore.innings_number === 1;
+        const h1 = isInn1 ? liveScore.ball_history : (liveScore.innings1_history || []);
+        const h2 = isInn1 ? [] : (liveScore.ball_history || []);
+
+        const t1Id = String(match.team1_id);
+        const t1Name = match.team1_name || 'Team 1';
+        const t2Name = match.team2_name || 'Team 2';
+
+        const inn1TeamId = isInn1 ? liveScore.batting_team_id : liveScore.innings1_team_id;
+        const inn1Name = String(inn1TeamId) === t1Id ? t1Name : t2Name;
+        const inn2Name = inn1Name === t1Name ? t2Name : t1Name;
+
+        const maxBalls = Math.max(h1.length, h2.length);
+        let data = [];
+        let cum1 = 0;
+        let cum2 = 0;
+
+        for (let i = 0; i < maxBalls; i++) {
+            if (h1[i]) cum1 += (h1[i].runs || 0) + (h1[i].extra ? 1 : 0);
+            if (h2[i]) cum2 += (h2[i].runs || 0) + (h2[i].extra ? 1 : 0);
+
+            data.push({
+                ball: i + 1,
+                inn1Score: i < h1.length ? cum1 : null,
+                inn2Score: i < h2.length ? cum2 : null,
+                inn1Team: inn1Name,
+                inn2Team: inn2Name
+            });
+        }
+        return data;
+    };
+
+    // Determine current inn names for Line Chart names
+    const inn1TeamIdForLine = liveScore.innings_number === 1 ? liveScore.batting_team_id : liveScore.innings1_team_id;
+    const inn1LineName = String(inn1TeamIdForLine) === String(match?.team1_id) ? match?.team1_name : match?.team2_name;
+    const inn2LineName = inn1LineName === match?.team1_name ? match?.team2_name : match?.team1_name;
 
     return (
         <div className="live-scoring-page viewer-mode">
@@ -170,11 +212,153 @@ const LiveMatchView = () => {
             </div>
             
             {liveScore.innings_complete && (
-                <div className="modal-overlay blur" style={{zIndex: 2000}}>
-                    <div className="simple-modal glass-card animate-pop">
-                        <h1 className="gradient-text">{liveScore.innings_number === 1 ? 'Innings Complete' : 'Match Concluded'}</h1>
-                        <p style={{fontSize: '1.2rem', marginBottom: '2rem', color: 'var(--neon-green)'}}>{match.match_summary || "Analyzing game results..."}</p>
-                        <button className="prime-action-btn" onClick={() => navigate('/live-matches')}>Return to Arena</button>
+                <div className="modal-overlay blur full-summary viewer-summary-overlay">
+                    <div className="summary-card glass-card animate-pop viewer-summary-card">
+                        <div className="summary-header">
+                            <div>
+                                <h1 className="gradient-text">{liveScore.innings_number === 1 ? 'First Innings Complete' : 'Match Concluded'}</h1>
+                                <p>{match?.team1_name} vs {match?.team2_name}</p>
+                            </div>
+                            <div className="total-display">
+                                <span className="runs" style={{ fontSize: '3rem' }}>{liveScore.total_runs}/{liveScore.total_wickets}</span>
+                            </div>
+                        </div>
+
+                        {liveScore.innings_number === 2 && match?.winner_team_id && (
+                            <div className="victory-banner glass-card" style={{ marginBottom: '2rem' }}>
+                                <h2 style={{ color: 'var(--neon-green)', textAlign: 'center' }}>
+                                    🏆 {match.match_summary?.replace(/Team A/gi, match.team1_name).replace(/Team B/gi, match.team2_name)}
+                                </h2>
+                            </div>
+                        )}
+
+                        <div className="summary-scroll-content">
+                            {(() => {
+                                const isInn1 = liveScore.innings_number === 1;
+                                const t1Squad = isInn1 ? battingSquad : bowlingSquad;
+                                const t2Squad = isInn1 ? bowlingSquad : battingSquad;
+                                const t1Name = match?.team1_name || 'Team 1';
+                                const t2Name = match?.team2_name || 'Team 2';
+
+                                const combinedStats = {};
+                                [liveScore.innings1_player_stats, liveScore.player_stats].forEach(ps => {
+                                    if (!ps) return;
+                                    Object.entries(ps).forEach(([pid, stats]) => {
+                                        if (!combinedStats[pid]) combinedStats[pid] = { runs: 0, balls: 0, wickets: 0, runs_conceded: 0, balls_bowled: 0 };
+                                        combinedStats[pid].runs += (stats.runs || 0);
+                                        combinedStats[pid].balls += (stats.balls || 0);
+                                        combinedStats[pid].wickets += (stats.wickets || 0);
+                                        combinedStats[pid].runs_conceded += (stats.runs_conceded || 0);
+                                        combinedStats[pid].balls_bowled += (stats.balls_bowled || 0);
+                                    });
+                                });
+
+                                const combinedWickets = [...(liveScore.innings1_wickets_list || []), ...(liveScore.wickets_list || [])].map(String);
+
+                                const renderBatterRow = (p) => {
+                                    const stats = combinedStats[p.id] || { runs: 0, balls: 0 };
+                                    const sr = stats.balls > 0 ? ((stats.runs / stats.balls) * 100).toFixed(1) : "0.0";
+                                    const out = combinedWickets.includes(String(p.id));
+                                    const isMatchMVP = String(match?.best_batsman_id) === String(p.id);
+
+                                    return (
+                                        <tr key={p.id} className={isMatchMVP ? 'mvp-row animate-glow' : ''}>
+                                            <td>
+                                                <div className="player-cell">
+                                                    {p.name}
+                                                    {isMatchMVP && <div className="badge-rack"><span className="mvp-badge">⚡ MVP</span></div>}
+                                                </div>
+                                            </td>
+                                            <td className="bold">{stats.runs}</td>
+                                            <td>{stats.balls}</td>
+                                            <td className="dim-text">{sr}</td>
+                                            <td><span className={`status-tag ${out ? 'out' : 'not-out'}`}>{out ? 'Out' : 'Not Out'}</span></td>
+                                        </tr>
+                                    );
+                                };
+
+                                const renderBowlerRow = (p) => {
+                                    const stats = combinedStats[p.id] || { wickets: 0, runs_conceded: 0, balls_bowled: 0 };
+                                    const econ = stats.balls_bowled > 0 ? ((stats.runs_conceded / stats.balls_bowled) * 6).toFixed(2) : "0.00";
+                                    const isMatchMVP = String(match?.best_bowler_id) === String(p.id);
+
+                                    return (
+                                        <tr key={p.id} className={isMatchMVP ? 'mvp-row-bowler animate-glow-bowl' : ''}>
+                                            <td>
+                                                <div className="player-cell">
+                                                    {p.name}
+                                                    {isMatchMVP && <div className="badge-rack"><span className="mvp-badge bowl">🎯 MVP</span></div>}
+                                                </div>
+                                            </td>
+                                            <td className="bold">{stats.wickets}</td>
+                                            <td>{stats.runs_conceded}</td>
+                                            <td className="dim-text">{econ}</td>
+                                        </tr>
+                                    );
+                                };
+
+                                return (
+                                    <>
+                                        <div className="scorecard-viz">
+                                            <div className="viz-header-row">
+                                                <h3>Match Batting Masterclass</h3>
+                                            </div>
+                                            <table className="summary-table master">
+                                                <thead><tr><th>Batsman</th><th>Runs</th><th>Balls</th><th>SR</th><th>Status</th></tr></thead>
+                                                <tbody>
+                                                    <tr className="team-split-header"><td colSpan="5">{t1Name}</td></tr>
+                                                    {t1Squad.map(renderBatterRow)}
+                                                    <tr className="team-split-header"><td colSpan="5">{t2Name}</td></tr>
+                                                    {t2Squad.map(renderBatterRow)}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div className="scorecard-viz">
+                                            <div className="viz-header-row">
+                                                <h3>Match Bowling Force</h3>
+                                            </div>
+                                            <table className="summary-table master">
+                                                <thead><tr><th>Bowler</th><th>Wkts</th><th>Runs</th><th>Econ</th></tr></thead>
+                                                <tbody>
+                                                    <tr className="team-split-header"><td colSpan="4">{t1Name}</td></tr>
+                                                    {t1Squad.map(renderBowlerRow)}
+                                                    <tr className="team-split-header"><td colSpan="4">{t2Name}</td></tr>
+                                                    {t2Squad.map(renderBowlerRow)}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </>
+                                );
+                            })()}
+
+                            <div className="match-analytics-suite animate-slide-up">
+                                <div className="chart-container glass-card">
+                                    <h3 style={{ color: 'var(--neon-blue)', marginBottom: '1.5rem' }}>Battle Flow: Run Progression</h3>
+                                    <div style={{ width: '100%', height: 300 }}>
+                                        <ResponsiveContainer>
+                                            <LineChart data={getChartData()}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                                                <XAxis dataKey="ball" stroke="#64748b" />
+                                                <YAxis stroke="#64748b" />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#0d1117', border: '1px solid var(--neon-blue)', borderRadius: '12px' }}
+                                                />
+                                                <Legend verticalAlign="top" />
+                                                <Line type="monotone" dataKey="inn1Score" name={inn1LineName} stroke="var(--neon-pink)" strokeWidth={3} dot={false} connectNulls />
+                                                <Line type="monotone" dataKey="inn2Score" name={inn2LineName} stroke="var(--neon-blue)" strokeWidth={3} dot={false} connectNulls />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="modal-footer" style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
+                            <button className="prime-action-btn" onClick={() => navigate('/live-matches')}>
+                                Exit to Lobby
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

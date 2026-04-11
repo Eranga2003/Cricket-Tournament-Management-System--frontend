@@ -1,0 +1,359 @@
+:root {
+  --neon-blue: #00e1ff;
+  --neon-pink: #ff2e93;
+  --neon-green: #39ff14;
+  --neon-purple: #bc13fe;
+  --wicket-red: #f43f5e;
+  --card-border: rgba(255, 255, 255, 0.1);
+}
+
+.scorecard-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(2, 6, 23, 0.95);
+    backdrop-filter: blur(25px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.scorecard-modal-content {
+    background: #0a0e1a;
+    border: 1px solid var(--card-border);
+    border-radius: 40px;
+    width: 100%;
+    max-width: 950px;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 1);
+    position: relative;
+    animation: slideUpScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scorecard-modal-header {
+    padding: 2.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+}
+
+.header-match-titles h2 {
+    font-size: 2.2rem;
+    font-weight: 950;
+    letter-spacing: -1px;
+    margin: 0;
+    background: linear-gradient(90deg, #fff, var(--neon-blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-match-titles p {
+    margin: 0.5rem 0 0;
+    color: #64748b;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.score-badge-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem 2rem;
+    border-radius: 24px;
+    border: 1px solid var(--card-border);
+}
+
+.team-total {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+}
+
+.team-total .n {
+    font-size: 0.6rem;
+    color: #94a3b8;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.team-total .s {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: white;
+}
+
+.score-divider {
+    color: #475569;
+    font-weight: 900;
+    font-size: 0.9rem;
+    opacity: 0.5;
+}
+
+.close-modal-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s;
+}
+
+.close-modal-btn:hover {
+    background: var(--neon-pink);
+    transform: rotate(90deg);
+}
+
+.scorecard-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+/* VICTORY BANNER - REFINED */
+.victory-banner {
+    width: 100%;
+    padding: 4rem 2rem;
+    text-align: center;
+    border-radius: 40px;
+    background: linear-gradient(180deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+    border: 2px solid rgba(57, 255, 20, 0.3);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center content vertically */
+    gap: 2.5rem;
+    backdrop-filter: blur(15px);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: visible; /* Ensure nothing is cut off */
+}
+
+.winner-logo-nexus {
+  width: 180px; /* Slightly larger for impact */
+  height: 180px;
+  border-radius: 50%;
+  background: #000;
+  border: 4px solid var(--neon-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 50px rgba(57, 255, 20, 0.4);
+  animation: logoPulse 2s infinite ease-in-out;
+  position: relative;
+  z-index: 5;
+}
+
+@keyframes logoPulse {
+  0% { transform: scale(1); box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); }
+  50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(57, 255, 20, 0.5); }
+  100% { transform: scale(1); box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); }
+}
+
+.winner-stadium-logo {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.victory-banner h2 {
+    font-size: 2.2rem;
+    font-weight: 950;
+    color: var(--neon-green);
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    text-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+}
+
+/* MASTER TABLES - SYNCED */
+.scorecard-viz {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 24px;
+  padding: 2rem;
+  border: 1px solid var(--card-border);
+}
+
+.viz-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.viz-header-row h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #64748b;
+}
+
+.winner-tag-info {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--neon-green);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(57, 255, 20, 0.05);
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  border: 1px solid rgba(57, 255, 20, 0.2);
+}
+
+.summary-table.master {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summary-table.master th {
+  text-align: left;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.summary-table.master td {
+  padding: 1.2rem 1rem;
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.team-split-header td {
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 900 !important;
+  color: var(--neon-blue) !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 1rem !important;
+}
+
+.player-cell {
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+}
+
+.badge-rack {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mvp-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.8rem;
+  background: var(--neon-blue);
+  color: black;
+  box-shadow: 0 0 10px var(--neon-blue);
+}
+
+.mvp-badge.champion { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+.mvp-badge.bowl { background: var(--neon-pink); color: white; box-shadow: 0 0 10px var(--neon-pink); }
+
+.status-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-tag.out { color: var(--wicket-red); }
+.status-tag.not-out { color: var(--neon-green); }
+
+/* MVP ROWS */
+.mvp-row { background: rgba(0, 225, 255, 0.05); animation: rowGlow 3s infinite ease-in-out; }
+.mvp-row-bowler { background: rgba(255, 46, 147, 0.05); animation: rowGlowBowl 3s infinite ease-in-out; }
+
+@keyframes rowGlow {
+  0%, 100% { background: rgba(0, 225, 255, 0.03); }
+  50% { background: rgba(0, 225, 255, 0.12); }
+}
+
+@keyframes rowGlowBowl {
+  0%, 100% { background: rgba(255, 46, 147, 0.03); }
+  50% { background: rgba(255, 46, 147, 0.12); }
+}
+
+/* ANALYTICS */
+.analytics-section {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--card-border);
+  border-radius: 32px;
+  padding: 2.5rem;
+}
+
+.analytics-section h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #64748b;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 350px;
+}
+
+/* FOOTER */
+.scorecard-footer-buttons {
+    padding: 2rem 3rem;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.finish-return-btn {
+    width: 100%;
+    padding: 1.5rem;
+    border-radius: 20px;
+    background: white;
+    color: black;
+    font-size: 1.1rem;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.finish-return-btn:hover {
+    background: var(--neon-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUpScale {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
